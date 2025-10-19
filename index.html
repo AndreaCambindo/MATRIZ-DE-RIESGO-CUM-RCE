@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MATRIZ DE RIESGO PÓLIZAS CUM Y RCE</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --primary:#0b63b6;
+    --muted:#6b7280;
+    --card:#f8fafc;
+    --table-border:#d1d5db;
+    --maxw:1100px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:#111827;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:var(--maxw);
+  }
+
+  /* Header with 3 logos left, title center, 1 logo right */
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .logos-left{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .logo-slot{
+    width:133px;
+    height:60px;
+    border:1px solid #e6eef9;
+    border-radius:6px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .logo-slot img {
+    transform: scale(1.9);
+    max-width:80%;
+    max-height:80%;
+    object-fit:contain;
+  }
+  #logo1 img, #logo3 img { transform: scale(2.2); }
+  #logo2 img { transform: scale(1.9); }
+  #logo4 img { transform: scale(1.2); }
+
+  .app-title{
+    font-size:18px;
+    font-weight:700;
+    color:var(--primary);
+    letter-spacing:0.6px;
+  }
+  .app-sub{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:6px;
+  }
+
+  /* Controls */
+  .controls{
+    background:var(--card);
+    border:1px solid #e6eef9;
+    padding:14px;
+    border-radius:8px;
+    display:flex;
+    gap:18px;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .checkboxes{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .chk{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    font-size:14px;
+    color:#0f172a;
+  }
+  .actions{
+    margin-left:auto;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  button{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+  }
+  button.secondary{
+    background:#f1f5f9;
+    color:var(--primary);
+    border:1px solid #dbeafe;
+    font-weight:600;
+  }
+
+  /* Table */
+  .table-wrap{
+    background:white;
+    border:1px solid var(--table-border);
+    border-radius:8px;
+    overflow:auto;
+    padding:12px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:720px;
+  }
+  thead th{
+    text-align:left;
+    font-size:13px;
+    color:white;
+    background:linear-gradient(180deg,var(--primary),#08559a);
+    padding:12px;
+    border-bottom:2px solid rgba(0,0,0,0.04);
+  }
+  tbody td{
+    padding:12px;
+    border-bottom:1px solid #eef2f7;
+    vertical-align:top;
+    font-size:14px;
+    color:#0f172a;
+  }
+  tbody tr:last-child td{border-bottom:none}
+
+  .range{
+    font-weight:700;
+    color:var(--primary);
+    cursor:pointer;
+    display:inline-block;
+    min-width:80px;
+  }
+  .desc{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.3;
+  }
+  .range-input{
+    font-weight:700;
+    font-size:13px;
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid #cbd5e1;
+    width:160px;
+  }
+
+  /* Garantías opcionales */
+  .optional-wrap {
+    margin-top: 18px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: none; /* ocultas hasta generar la matriz */
+  }
+  .optional-wrap h4 {
+    font-size: 14px;
+    color: var(--primary);
+    margin: 0 0 8px 0;
+  }
+  .optional-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .optional-item {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: grab;
+    font-size: 14px;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  .optional-item:active {
+    cursor: grabbing;
+    background: #e0f2fe;
+  }
+
+  /* Delete button style */
+  .remove-row {
+    background:none;
+    border:none;
+    color:#dc2626;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:700;
+    margin-left:8px;
+  }
+
+  /* Print styles */
+  @media print {
+    body {
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .app {
+      max-width: 100%;
+      padding: 18px;
+    }
+    .controls, .optional-wrap { display: none !important; }
+    button { display: none; }
+    thead th { color: white !important; }
+    .logo-slot { border: 0; }
+  }
+
+  @media (max-width:860px){
+    .controls{flex-direction:column;align-items:stretch}
+    .actions{margin-left:0;justify-content:flex-end}
+    .logo-slot{width:64px;height:44px}
+    table{min-width:640px}
+  }
+  .empty{
+    padding:28px;
+    text-align:center;
+    color:var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- Header -->
+<div class="header">
+  <div class="logos-left">
+    <div class="logo-slot" id="logo1">
+      <img src="./incauca.png" alt="Logo 1">
+    </div>
+    <div class="logo-slot" id="logo2">
+      <img src="./providencia.jpg" alt="Logo 2">
+    </div>
+    <div class="logo-slot" id="logo3">
+      <img src="./sucroal.webp" alt="Logo 3">
+    </div>
+  </div>
+
+  <div class="title-wrap">
+    <div class="app-title">MATRIZ DE RIESGO PÓLIZAS CUM Y RCE</div>
+    <div class="app-sub" id="subtitle">Herramienta para determinar garantías aplicables según el objeto del contrato</div>
+  </div>
+
+  <div class="logo-slot" id="logo4">
+    <img src="./aress.jpeg" alt="Logo 4">
+  </div>
+</div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="checkboxes">
+          <label class="chk"><input type="checkbox" id="chkServicios"> Servicios</label>
+          <label class="chk"><input type="checkbox" id="chkSuministro"> Suministro</label>
+          <label class="chk"><input type="checkbox" id="chkObra"> Obra civil</label>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Selecciona una o varias opciones. Luego presiona <strong>Generar matriz</strong>.</div>
+      </div>
+
+      <div class="actions">
+        <button id="generateBtn">Generar matriz</button>
+        <button id="exportBtn" class="secondary">Exportar a PDF</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap" id="tableWrap">
+      <table id="matrixTable">
+        <thead>
+          <tr>
+            <th>GARANTÍA</th>
+            <th>RANGO DE % APLICABLE</th>
+            <th>RESUMEN / DESCRIPCIÓN</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="matrixBody">
+          <tr><td colspan="4" class="empty">No hay garantías seleccionadas. Selecciona objetos y presiona <strong>Generar matriz</strong>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Garantías opcionales (ocultas hasta generar) -->
+    <div class="optional-wrap" id="optionalWrap">
+      <h4>Garantías opcionales (arrástralas a la tabla si aplican)</h4>
+      <div class="optional-list" id="optionalList">
+        <div class="optional-item" draggable="true" data-name="Anticipo">Anticipo — 30% — Garantiza la correcta inversión del anticipo.</div>
+        <div class="optional-item" draggable="true" data-name="Calidad de los bienes">Calidad de los bienes — 10% - 20% — Garantiza que los bienes cumplan las especificaciones.</div>
+        <div class="optional-item" draggable="true" data-name="Calidad y/o correcto funcionamiento de los bienes">Calidad y/o correcto funcionamiento de los bienes — 10% - 20% — Cubre defectos o fallas posteriores a la entrega.</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* --- Datos --- */
+const guaranteesData = {
+  "Cumplimiento": {range:"10% - 30%",desc:"Garantiza que el contratista cumpla todas las obligaciones del contrato."},
+  "Calidad del servicio": {range:"10% - 20%",desc:"Asegura que los servicios prestados cumplan los estándares técnicos y de calidad."},
+  "Calidad de los bienes": {range:"10% - 20%",desc:"Garantiza que los bienes entregados cumplan las especificaciones acordadas."},
+  "Calidad y/o correcto funcionamiento de los bienes": {range:"10% - 20%",desc:"Cubre defectos de fabricación o funcionamiento posterior a la entrega."},
+  "Estabilidad de la obra": {range:"10% - 30%",desc:"Cubre defectos o fallas estructurales en obras civiles durante el periodo de garantía."},
+  "Pago de salarios y prestaciones": {range:"5% - 10%",desc:"Asegura el pago de salarios y obligaciones laborales del contratista."},
+  "RCE (Responsabilidad Civil Extracontractual)": {range:"Según riesgo",desc:"Cubre daños o perjuicios a terceros durante la ejecución del contrato."},
+  "Anticipo": {range:"30%",desc:"Garantiza la correcta inversión del anticipo entregado por la entidad."}
+};
+
+const mapping = {
+  "Servicios":["Cumplimiento","Calidad del servicio","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"],
+  "Suministro":["Cumplimiento","Calidad de los bienes","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"],
+  "Obra civil":["Cumplimiento","Pago de salarios y prestaciones","Estabilidad de la obra","RCE (Responsabilidad Civil Extracontractual)"]
+};
+const order=["Cumplimiento","Calidad del servicio","Calidad de los bienes","Calidad y/o correcto funcionamiento de los bienes","Estabilidad de la obra","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"];
+
+/* DOM */
+const chkServicios = document.getElementById("chkServicios");
+const chkSuministro = document.getElementById("chkSuministro");
+const chkObra = document.getElementById("chkObra");
+const generateBtn = document.getElementById("generateBtn");
+const exportBtn = document.getElementById("exportBtn");
+const matrixBody = document.getElementById("matrixBody");
+const optionalWrap = document.getElementById("optionalWrap");
+const optionalList = document.getElementById("optionalList");
+
+/* Generar matriz */
+generateBtn.addEventListener("click", () => {
+  const sel=[];
+  if(chkServicios.checked) sel.push("Servicios");
+  if(chkSuministro.checked) sel.push("Suministro");
+  if(chkObra.checked) sel.push("Obra civil");
+
+  const subtitle = document.getElementById("subtitle");
+  subtitle.textContent = sel.length ? "Para objeto: " + sel.join(", ") : "Herramienta para determinar garantías aplicables según el objeto del contrato";
+
+  const set = new Set();
+  sel.forEach(o => (mapping[o]||[]).forEach(g => set.add(g)));
+
+  if(!set.size){
+    matrixBody.innerHTML = '<tr><td colspan="4" class="empty">No hay garantías seleccionadas. Selecciona objetos y presiona <strong>Generar matriz</strong>.</td></tr>';
+    optionalWrap.style.display = 'none';
+    return;
+  }
+
+  // mostrar opcionales ahora que se generó la matriz
+  optionalWrap.style.display = 'block';
+
+  // limpiar tabla y poblar en orden
+  matrixBody.innerHTML = "";
+  order.filter(n => set.has(n)).forEach(name => {
+    addRowToTable(name);
+  });
+});
+
+/* FUNCIONES: añadir fila (colocar remove al final) y evitar duplicados */
+function addRowToTable(name){
+  // evita duplicados
+  const exists = [...matrixBody.querySelectorAll("tr")].some(tr=>{
+    const firstCell = tr.querySelector("td");
+    return firstCell && firstCell.textContent.trim() === name;
+  });
+  if(exists) return;
+
+  const g = guaranteesData[name] || {range:"—", desc:""};
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td style="font-weight:700">${escapeHtml(name)}</td>
+    <td><span class="range" tabindex="0">${escapeHtml(g.range)}</span></td>
+    <td><div class="desc">${escapeHtml(g.desc)}</div></td>
+    <td style="text-align:right"><button class="remove-row" title="Eliminar">✕</button></td>
+  `;
+
+  // insert before RCE if existe en la tabla, sino append
+  const rows = [...matrixBody.querySelectorAll("tr")];
+  const rceRow = rows.find(r => r.textContent.includes("RCE"));
+  if(rceRow){
+    matrixBody.insertBefore(tr, rceRow);
+  } else {
+    matrixBody.appendChild(tr);
+  }
+}
+
+/* Editable range (delegación) */
+matrixBody.addEventListener("click", e => {
+  if(e.target.classList.contains("range")) makeEditable(e.target);
+  if(e.target.classList.contains("remove-row")) e.target.closest("tr").remove();
+});
+function makeEditable(span){
+  if(span.dataset.editing) return;
+  span.dataset.editing = "1";
+  const val = span.textContent.trim();
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = val;
+  input.className = "range-input";
+  span.replaceWith(input);
+  input.focus();
+  input.addEventListener("blur", () => commit(input));
+  input.addEventListener("keydown", e=>{
+    if(e.key==="Enter"){e.preventDefault();input.blur();}
+    else if(e.key==="Escape"){restore(input,val);}
+  });
+}
+function commit(input){
+  const val=(input.value||"").trim()||"—";
+  restore(input,val);
+}
+function restore(input,val){
+  const span=document.createElement("span");
+  span.className="range";
+  span.tabIndex=0;
+  span.textContent=val;
+  input.replaceWith(span);
+}
+
+/* Drag & Drop de garantías opcionales */
+/* arrastrar desde la lista (optionalList) */
+optionalList.querySelectorAll(".optional-item").forEach(item=>{
+  item.addEventListener("dragstart", e=>{
+    e.dataTransfer.setData("text/plain", e.target.dataset.name || e.target.textContent.trim());
+  });
+});
+
+/* permitir drop sobre la tabla (matrixTable) */
+const table = document.getElementById("matrixTable");
+table.addEventListener("dragover", e => e.preventDefault());
+table.addEventListener("drop", e => {
+  e.preventDefault();
+  const name = e.dataTransfer.getData("text/plain");
+  if(!name || !guaranteesData[name]) return;
+  // evitar duplicados
+  const exists = [...matrixBody.querySelectorAll("tr")].some(tr=>{
+    const firstCell = tr.querySelector("td");
+    return firstCell && firstCell.textContent.trim() === name;
+  });
+  if(exists) return;
+  // crear fila y colocar antes de RCE si existe
+  const g = guaranteesData[name];
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td style="font-weight:700">${escapeHtml(name)}</td>
+    <td><span class="range" tabindex="0">${escapeHtml(g.range)}</span></td>
+    <td><div class="desc">${escapeHtml(g.desc)}</div></td>
+    <td style="text-align:right"><button class="remove-row" title="Eliminar">✕</button></td>
+  `;
+  // find RCE row
+  const rows = [...matrixBody.querySelectorAll("tr")];
+  const rceRow = rows.find(r => r.textContent.includes("RCE"));
+  if(rceRow){
+    matrixBody.insertBefore(tr, rceRow);
+  } else {
+    matrixBody.appendChild(tr);
+  }
+});
+
+/* Export / imprimir */
+exportBtn.addEventListener("click", ()=>{
+  commitAll();
+  setTimeout(()=>window.print(),60);
+});
+function commitAll(){
+  document.querySelectorAll("input.range-input").forEach(inp=>commit(inp));
+}
+function escapeHtml(str){
+  return String(str||"")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+}
+</script>
+</body>
+</html>
