@@ -307,11 +307,9 @@
 
     <!-- Garantías opcionales (ocultas hasta generar) -->
     <div class="optional-wrap" id="optionalWrap">
-      <h4>Garantías opcionales (arrástralas a la tabla si aplican)</h4>
+      <h4>Garantía opcional (arrástrala a la tabla si aplica)</h4>
       <div class="optional-list" id="optionalList">
-        <div class="optional-item" draggable="true" data-name="Anticipo">Anticipo — 30% — Garantiza la correcta inversión del anticipo.</div>
-        <div class="optional-item" draggable="true" data-name="Calidad de los bienes">Calidad de los bienes — 10% - 20% — Garantiza que los bienes cumplan las especificaciones.</div>
-        <div class="optional-item" draggable="true" data-name="Calidad y/o correcto funcionamiento de los bienes">Calidad y/o correcto funcionamiento de los bienes — 10% - 20% — Cubre defectos o fallas posteriores a la entrega.</div>
+        <div class="optional-item" draggable="true" data-name="Anticipo">Anticipo — 5% - 50% Max valor contrato — Garantiza la correcta inversión del anticipo.</div>
       </div>
     </div>
   </div>
@@ -319,22 +317,49 @@
 <script>
 /* --- Datos --- */
 const guaranteesData = {
-  "Cumplimiento": {range:"10% - 30%",desc:"Garantiza que el contratista cumpla todas las obligaciones del contrato."},
-  "Calidad del servicio": {range:"10% - 20%",desc:"Asegura que los servicios prestados cumplan los estándares técnicos y de calidad."},
-  "Calidad de los bienes": {range:"10% - 20%",desc:"Garantiza que los bienes entregados cumplan las especificaciones acordadas."},
-  "Calidad y/o correcto funcionamiento de los bienes": {range:"10% - 20%",desc:"Cubre defectos de fabricación o funcionamiento posterior a la entrega."},
-  "Estabilidad de la obra": {range:"10% - 30%",desc:"Cubre defectos o fallas estructurales en obras civiles durante el periodo de garantía."},
-  "Pago de salarios y prestaciones": {range:"5% - 10%",desc:"Asegura el pago de salarios y obligaciones laborales del contratista."},
-  "RCE (Responsabilidad Civil Extracontractual)": {range:"Según riesgo",desc:"Cubre daños o perjuicios a terceros durante la ejecución del contrato."},
-  "Anticipo": {range:"30%",desc:"Garantiza la correcta inversión del anticipo entregado por la entidad."}
+  "Cumplimiento": {
+    range: "5% - 30%",
+    desc: "Garantiza que el contratista cumpla todas las obligaciones del contrato."
+  },
+  "Calidad del servicio": {
+    range: "5% - 30%",
+    desc: "Asegura que los servicios prestados cumplan los estándares técnicos y de calidad."
+  },
+  "Calidad y/o correcto funcionamiento de los bienes": {
+    range: "5% - 30%",
+    desc: "Cubre defectos de fabricación o funcionamiento posterior a la entrega."
+  },
+  "Estabilidad de la obra": {
+    range: "5% - 30%",
+    desc: "Cubre defectos o fallas estructurales en obras civiles durante el periodo de garantía."
+  },
+  "Pago de salarios y prestaciones": {
+    range: "5% - 15%",
+    desc: "Asegura el pago de salarios y obligaciones laborales del contratista."
+  },
+  "RCE (Responsabilidad Civil Extracontractual)": {
+    range: "100 millones - 30%",
+    desc: `Cubre daños o perjuicios a terceros durante la ejecución del contrato.
+      Amparos:
+      - Responsabilidad cruzada (30% del valor de la póliza)
+      - Responsabilidad civil patronal (30% del valor de la póliza)
+      - Contratistas y subcontratistas (100% del valor de la póliza)
+      - Gastos médicos (10% del valor de la póliza)
+      - Vehículos propios y no propios (20% del valor de la póliza)
+      - Productos (30% del valor de la póliza, si aplica)`
+  },
+  "Anticipo": {
+    range: "5% - 50% Max valor contrato",
+    desc: "Garantiza la correcta inversión del anticipo entregado por la entidad."
+  }
 };
 
 const mapping = {
   "Servicios":["Cumplimiento","Calidad del servicio","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"],
-  "Suministro":["Cumplimiento","Calidad de los bienes","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"],
+  "Suministro":["Cumplimiento", "Calidad y/o correcto funcionamiento de los bienes","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"],
   "Obra civil":["Cumplimiento","Pago de salarios y prestaciones","Estabilidad de la obra","RCE (Responsabilidad Civil Extracontractual)"]
 };
-const order=["Cumplimiento","Calidad del servicio","Calidad de los bienes","Calidad y/o correcto funcionamiento de los bienes","Estabilidad de la obra","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"];
+const order=["Cumplimiento","Calidad del servicio", "Calidad y/o correcto funcionamiento de los bienes","Estabilidad de la obra","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"];
 
 /* DOM */
 const chkServicios = document.getElementById("chkServicios");
