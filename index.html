@@ -284,6 +284,7 @@
 
       <div class="actions">
         <button id="generateBtn">Generar matriz</button>
+        <a href="./garantias.html" style="display:inline-block;margin-left:10px;background:#0b63b6;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-weight:700;">Ver garantías detalladas</a>
         <button id="exportBtn" class="secondary">Exportar a PDF</button>
       </div>
     </div>
@@ -309,7 +310,8 @@
     <div class="optional-wrap" id="optionalWrap">
       <h4>Garantía opcional (arrástrala a la tabla si aplica)</h4>
       <div class="optional-list" id="optionalList">
-        <div class="optional-item" draggable="true" data-name="Anticipo">Anticipo — 5% - 50% Max valor contrato — Garantiza la correcta inversión del anticipo.</div>
+        <div class="optional-item" draggable="true" data-name="Buen manejo del anticipo">Buen manejo del anticipo — 5% - 50% Max valor contrato.</div>
+        <div class="optional-item" draggable="true" data-name="Calidad de los elementos">Calidad de los elementos — 5% - 30%</div>
       </div>
     </div>
   </div>
@@ -319,23 +321,27 @@
 const guaranteesData = {
   "Cumplimiento": {
     range: "5% - 30%",
-    desc: "Garantiza que el contratista cumpla todas las obligaciones del contrato."
+    desc: "Cubre el incumplimiento total o parcial de las obligaciones contractuales. Es decir, cuando el contratista no entrega, no cumple los plazos, o no realiza las condiciones pactadas."
   },
   "Calidad del servicio": {
     range: "5% - 30%",
-    desc: "Asegura que los servicios prestados cumplan los estándares técnicos y de calidad."
+    desc: "Garantiza que el contratista preste el servicio con la calidad, idoneidad y eficiencia acordadas. Si el servicio se ejecuta de forma deficiente, incompleta o causa perjuicios por mala prestación, la aseguradora debe indemnizar."
+  },
+  "Calidad de los elementos": {
+    range: "5% - 30%",
+    desc: "Cubre los defectos, mala calidad o no conformidad de los materiales, bienes o equipos suministrados por el contratista."
   },
   "Calidad y/o correcto funcionamiento de los bienes": {
     range: "5% - 30%",
-    desc: "Cubre defectos de fabricación o funcionamiento posterior a la entrega."
+    desc: "Garantiza que los bienes entregados funcionen adecuadamente durante un periodo determinado y no presenten fallas o defectos ocultos atribuibles al contratista o proveedor."
   },
   "Estabilidad de la obra": {
     range: "5% - 30%",
-    desc: "Cubre defectos o fallas estructurales en obras civiles durante el periodo de garantía."
+    desc: "Aplica en obras civiles o de infraestructura. Cubre los daños estructurales, colapsos o defectos constructivos que afecten la solidez, durabilidad o estabilidad de la obra dentro del plazo establecido (por lo general 3 años)."
   },
   "Pago de salarios y prestaciones": {
     range: "5% - 15%",
-    desc: "Asegura el pago de salarios y obligaciones laborales del contratista."
+    desc: "Cubre el pago de sueldos, cesantías, vacaciones, primas y seguridad social de los trabajadores vinculados al contrato, cuando el contratista incumple sus obligaciones laborales. Protege a los empleados y evita que el contratante sea responsable solidario."
   },
   "RCE (Responsabilidad Civil Extracontractual)": {
     range: "100 millones - 30%",
@@ -348,9 +354,9 @@ const guaranteesData = {
       - Vehículos propios y no propios (20% del valor de la póliza)
       - Productos (30% del valor de la póliza, si aplica)`
   },
-  "Anticipo": {
+  "Buen manejo del anticipo": {
     range: "5% - 50% Max valor contrato",
-    desc: "Garantiza la correcta inversión del anticipo entregado por la entidad."
+    desc: "Garantiza el uso correcto, exclusivo y adecuado del dinero entregado por el contratante al contratista como anticipo."
   }
 };
 
@@ -360,6 +366,61 @@ const mapping = {
   "Obra civil":["Cumplimiento","Pago de salarios y prestaciones","Estabilidad de la obra","RCE (Responsabilidad Civil Extracontractual)"]
 };
 const order=["Cumplimiento","Calidad del servicio", "Calidad y/o correcto funcionamiento de los bienes","Estabilidad de la obra","Pago de salarios y prestaciones","RCE (Responsabilidad Civil Extracontractual)"];
+
+/* 🔁 Restaurar matriz SOLO si realmente vienes desde garantías.html mediante navegación (no por refresh) */
+window.addEventListener("load", () => {
+  try {
+    const guardada = localStorage.getItem("matrizGenerada");
+    const subtitulo = localStorage.getItem("matrizSubtitulo");
+    const ultimaPagina = localStorage.getItem("ultimaPagina");
+
+    // Determinar tipo de navegación (método compatible con varios navegadores)
+    let navType = "unknown";
+    if (performance && performance.getEntriesByType) {
+      const entries = performance.getEntriesByType("navigation");
+      if (entries && entries.length) navType = entries[0].type; // 'navigate', 'reload', 'back_forward', 'prerender'
+    }
+    // Fallback antiguo (algunos navegadores)
+    if (navType === "unknown" && performance && performance.navigation) {
+      if (performance.navigation.type === 1) navType = "reload";
+      else if (performance.navigation.type === 2) navType = "back_forward";
+      else navType = "navigate";
+    }
+
+    // Saber si el usuario llegó desde garantias.html (link de navegación)
+    const ref = document.referrer || "";
+    const desdeGarantiasPorReferrer = ref.includes("garantias.html");
+
+    // Decision: restaurar solo si viniste POR NAVEGACIÓN desde garantias.html
+    const deberiaRestaurar = (navType === "navigate" && desdeGarantiasPorReferrer && ultimaPagina === "garantias" && guardada);
+
+    if (deberiaRestaurar) {
+      // Restaurar
+      matrixBody.innerHTML = guardada;
+      optionalWrap.style.display = 'block';
+      if (subtitulo) document.getElementById("subtitle").textContent = subtitulo;
+      // limpiar la marca para evitar restauraciones accidentales futuras
+      localStorage.removeItem("ultimaPagina");
+    } else {
+      // Si no corresponde restaurar (nuevo ingreso o refresh) -> limpiar todo
+      localStorage.removeItem("matrizGenerada");
+      localStorage.removeItem("matrizSubtitulo");
+      localStorage.removeItem("ultimaPagina");
+      matrixBody.innerHTML = '<tr><td colspan="4" class="empty">No hay garantías seleccionadas. Selecciona objetos y presiona <strong>Generar matriz</strong>.</td></tr>';
+      optionalWrap.style.display = 'none';
+      document.getElementById("subtitle").textContent = "Herramienta para determinar garantías aplicables según el objeto del contrato";
+    }
+  } catch (err) {
+    // En caso de cualquier error, asegurar estado limpio (defensivo)
+    console.warn("Error al restaurar/limpiar matriz:", err);
+    localStorage.removeItem("matrizGenerada");
+    localStorage.removeItem("matrizSubtitulo");
+    localStorage.removeItem("ultimaPagina");
+    matrixBody.innerHTML = '<tr><td colspan="4" class="empty">No hay garantías seleccionadas. Selecciona objetos y presiona <strong>Generar matriz</strong>.</td></tr>';
+    optionalWrap.style.display = 'none';
+    document.getElementById("subtitle").textContent = "Herramienta para determinar garantías aplicables según el objeto del contrato";
+  }
+});
 
 /* DOM */
 const chkServicios = document.getElementById("chkServicios");
@@ -398,6 +459,12 @@ generateBtn.addEventListener("click", () => {
   order.filter(n => set.has(n)).forEach(name => {
     addRowToTable(name);
   });
+
+    // Guardar el HTML de la tabla generada y el subtítulo
+  const matrizHTML = matrixBody.innerHTML;
+  const subtitulo = subtitle.textContent;
+  localStorage.setItem("matrizGenerada", matrizHTML);
+  localStorage.setItem("matrizSubtitulo", subtitulo);
 });
 
 /* FUNCIONES: añadir fila (colocar remove al final) y evitar duplicados */

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Garantías — Póliza de Cumplimiento</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --primary:#0b63b6;
+      --muted:#6b7280;
+      --card:#f8fafc;
+      --table-border:#d1d5db;
+      --maxw:1200px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111827;
+      padding:20px;
+      display:flex;
+      justify-content:center;
+    }
+    .app{
+      width:100%;
+      max-width:var(--maxw);
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+    }
+    .title h1{
+      margin:0;
+      font-size:18px;
+      color:var(--primary);
+      letter-spacing:0.4px;
+    }
+    .title p{
+      margin:6px 0 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .backlink{
+      text-decoration:none;
+      background:transparent;
+      border:1px solid #e6eef9;
+      padding:8px 12px;
+      border-radius:8px;
+      color:var(--primary);
+      font-weight:700;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .card{
+      background:white;
+      border:1px solid var(--table-border);
+      border-radius:12px;
+      padding:14px;
+      box-shadow: 0 6px 24px rgba(11,99,182,0.04);
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:980px;
+    }
+    thead th{
+      text-align:left;
+      font-size:13px;
+      color:white;
+      background:linear-gradient(180deg,var(--primary),#08559a);
+      padding:12px;
+      border-bottom:2px solid rgba(0,0,0,0.04);
+      position:sticky;
+      top:0;
+      z-index:2;
+    }
+    tbody td{
+      padding:12px;
+      border-bottom:1px solid #eef2f7;
+      vertical-align:top;
+      font-size:14px;
+      color:#0f172a;
+    }
+    .label{
+      font-weight:700;
+      color:var(--primary);
+      margin-bottom:6px;
+      display:inline-block;
+    }
+    .desc{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .small{
+      font-size:13px;
+      color:#334155;
+    }
+
+    @media (max-width:860px){
+      table{min-width:860px}
+      .topbar{flex-direction:column;align-items:flex-start;gap:10px}
+    }
+    @media print {
+      body{padding:0}
+      .topbar, .backlink { display:none; }
+      .card { box-shadow:none; border:0; }
+      thead th { color:white !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title">
+        <h1>Garantías — Póliza de Cumplimiento</h1>
+        <p>Fichas completas: definición, cobertura, ejemplo y a quién protege.</p>
+      </div>
+      <a class="backlink" href="./index.html">← Volver a Matriz de Riesgo</a>
+    </div>
+
+    <div class="card" id="card">
+      <table aria-label="Tabla de garantías">
+        <thead>
+          <tr>
+            <th>Garantía</th>
+            <th>Definición / Cobertura (más detalle)</th>
+            <th>Ejemplo práctico</th>
+            <th>A quién protege</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <!-- Filas generadas por JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Datos ampliados de las garantías (incluye campo 'protege')
+    const garantias = [
+      {
+        nombre: "Buen manejo del anticipo",
+        definicion: `Garantiza el uso correcto, exclusivo y adecuado del dinero entregado por el contratante al contratista como anticipo. 
+        Cubre los casos en los que el contratista destine total o parcialmente el anticipo a fines distintos a la ejecución del contrato o no logre justificarlo debidamente. 
+        El fin es asegurar que los recursos públicos o privados entregados sean invertidos únicamente en la realización del objeto contractual.`,
+        ejemplo: "Una empresa recibe un anticipo para comprar materiales, pero los usa para pagar deudas personales. La aseguradora cubre el valor no invertido correctamente y lo reintegra al contratante.",
+        protege: "Contratante o entidad que entrega el anticipo."
+      },
+      {
+        nombre: "Cumplimiento",
+        definicion: `Cobertura contra el incumplimiento total o parcial de las obligaciones contractuales. 
+        Incluye falta de entrega, retrasos injustificados, incumplimiento de especificaciones técnicas o necesidad de reposición/terminación del contrato. 
+        Su objetivo es indemnizar al contratante por los perjuicios económicos derivados del incumplimiento y garantizar la reparación o finalización del objeto contractual.`,
+        ejemplo: "Un proveedor no entrega un desarrollo de software en la fecha acordada y el contratante sufre pérdidas operativas; la póliza cubre gastos e indemnizaciones o garantiza la finalización.",
+        protege: "Contratante (principalmente)."
+      },
+      {
+        nombre: "Calidad del servicio",
+        definicion: `Cubre deficiencias en la prestación del servicio frente a los estándares, especificaciones o niveles de calidad pactados. 
+        Abarca errores, omisiones, procedimientos inadecuados y sus consecuencias económicas directas para el contratante.`,
+        ejemplo: "Un servicio de mantenimiento informático genera pérdida de datos por procedimiento negligente; la póliza responde por los daños atribuibles al servicio.",
+        protege: "Contratante."
+      },
+      {
+        nombre: "Calidad de los elementos",
+        definicion: `Protege contra defectos, no conformidad o mala calidad de los materiales, equipos o bienes suministrados. 
+        Asegura que los elementos entregados sean conformes con las especificaciones (calidad, materiales, origen y características técnicas) del contrato.`,
+        ejemplo: "Se entregan escritorios de calidad inferior a la pactada; la póliza cubre el reemplazo o el valor del perjuicio.",
+        protege: "Contratante."
+      },
+      {
+        nombre: "Calidad y correcto funcionamiento de los bienes",
+        definicion: `Garantiza el desempeño y correcto funcionamiento de los bienes entregados durante un periodo determinado posterior a la entrega. 
+        Cubre fallas de funcionamiento, defectos ocultos o vicios atribuibles a fabricación, suministro o instalación por parte del contratista. Es una especie de garantía posventa respaldada por la póliza.`,
+        ejemplo: "Cámaras de seguridad instaladas que fallan por mala instalación durante el periodo de garantía; la póliza cubre la reparación o reposición.",
+        protege: "Contratante."
+      },
+      {
+        nombre: "Estabilidad de la obra",
+        definicion: `Aplica a obras civiles e infraestructura: cubre defectos estructurales, colapsos, asentamientos o fallas que afecten la solidez y durabilidad de la obra durante el plazo de garantía técnica pactado (p. ej. 1–3 años). 
+        Incluye daños por deficiencias en diseño, materiales o ejecución que comprometan la estabilidad.`,
+        ejemplo: "Un puente presenta grietas o hundimientos por mala ejecución; la póliza cubre las reparaciones estructurales necesarias.",
+        protege: "Contratante o propietario de la obra."
+      },
+      {
+        nombre: "Salarios y prestaciones sociales",
+        definicion: `Asegura el pago de salarios, cesantías, primas, vacaciones, aportes a seguridad social y demás prestaciones laborales de los trabajadores vinculados al contrato cuando el contratista no cumpla sus obligaciones laborales. 
+        Evita que el contratante sea responsable solidario frente a los trabajadores.`,
+        ejemplo: "Obreros no reciben salarios ni aportes; los trabajadores reclaman y la póliza cubre el pago de las obligaciones laborales.",
+        protege: "Trabajadores y, en la práctica, también protege al contratante frente a responsabilidad solidaria."
+      },
+      {
+        nombre: "Responsabilidad Civil Extracontractual (RCE)",
+        definicion: `Ampara los daños y perjuicios causados a terceros (personas o bienes ajenos al contrato) durante la ejecución del contrato por hechos no contractuales. 
+        Cubre lesiones, daños a propiedades de terceros, gastos médicos y responsabilidades emergentes de accidentes o eventos imprevistos atribuibles a la actividad contractual.`,
+        ejemplo: "Durante una obra, una máquina daña un vehículo particular o causa lesiones a un transeúnte; la póliza cubre indemnizaciones y gastos médicos.",
+        protege: "Terceros afectados; protege al contratista frente a reclamos de terceros."
+      }
+    ];
+
+    const tbody = document.getElementById('tbody');
+
+    // Generar filas
+    garantias.forEach(g => {
+      const tr = document.createElement('tr');
+
+      const tdNombre = document.createElement('td');
+      tdNombre.innerHTML = `<div class="label">${escapeHtml(g.nombre)}</div>`;
+
+      const tdDef = document.createElement('td');
+      tdDef.innerHTML = `<div class="desc">${escapeHtml(g.definicion)}</div>`;
+
+      const tdEj = document.createElement('td');
+      tdEj.innerHTML = `<div class="desc">${escapeHtml(g.ejemplo)}</div>`;
+
+      const tdProt = document.createElement('td');
+      tdProt.innerHTML = `<div class="small">${escapeHtml(g.protege)}</div>`;
+
+      tr.appendChild(tdNombre);
+      tr.appendChild(tdDef);
+      tr.appendChild(tdEj);
+      tr.appendChild(tdProt);
+
+      tbody.appendChild(tr);
+    });
+
+    // util para evitar inyección de HTML
+    function escapeHtml(str){
+      return String(str||"")
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
+
+    // ✅ Marca que el usuario viene desde la página de garantías
+    window.addEventListener("beforeunload", () => {
+    localStorage.setItem("ultimaPagina", "garantias");
+    });
+  </script>
+</body>
+</html>
